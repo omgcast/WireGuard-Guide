@@ -4,6 +4,7 @@
 
 This guide provides a streamlined, step-by-step process to set up a secure WireGuard VPN on Arch Linux. It ensures proper configuration of public and private keys to avoid common issues related to authentication and traffic routing.
 
+[Русская версия](README-ru.md)
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
