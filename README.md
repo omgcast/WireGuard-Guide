@@ -2,7 +2,7 @@
 
 # WireGuard Setup Guide for Arch Linux
 
-This guide provides a streamlined, step-by-step process to set up a secure WireGuard VPN on Arch Linux. It ensures proper configuration of public and private keys to avoid common issues related to authentication and traffic routing.
+This guide provides a streamlined, step-by-step process to set up a secure WireGuard VPN on Arch Linux. It ensures proper configuration of public and private keys to avoid common issues related to authentication and traffic routing. The client setup covers various platforms, including Linux, Windows, and mobile devices (iOS/Android).
 
 [Русская версия](README-ru.md)
 ## Table of Contents
@@ -12,6 +12,9 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 3. [Key Generation](#key-generation)
 4. [Server Configuration](#server-configuration)
 5. [Client Configuration](#client-configuration)
+    - [Linux](#linux)
+    - [Windows](#windows)
+    - [iOS/Android](#iosandroid)
 6. [Firewall and Routing](#firewall-and-routing)
 7. [Starting WireGuard](#starting-wireguard)
 8. [Verification](#verification)
@@ -19,13 +22,14 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
 ## Prerequisites
 
-- **Arch Linux** installed on both server and client machines.
-- **Root** or **sudo** privileges on both machines.
+- **Arch Linux** installed on the server.
+- **Root** or **sudo** privileges on the server.
 - **Public IP** address for the server.
+- **WireGuard** application installed on the client device (Linux, Windows, iOS, Android).
 
 ## Installation
 
-### On Server and Client
+### On Server
 
 1. **Update the system:**
 
@@ -33,19 +37,25 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
     sudo pacman -Syu
     ```
 
-2. **Install WireGuard:**
-
-    ```bash
-    sudo pacman -S wireguard-tools
-    ```
-
-3. **Install Nano Editor (Optional but Recommended):**
+2. **Install WireGuard and Nano Editor:**
 
     Nano is a user-friendly text editor that simplifies editing configuration files.
 
     ```bash
-    sudo pacman -S nano
+    sudo pacman -S wireguard-tools nano
     ```
+
+### On Client
+
+- **Linux:**
+
+    ```bash
+    sudo pacman -S wireguard-tools nano
+    ```
+
+- **Windows, iOS, Android:**
+
+    Install the [WireGuard application](https://www.wireguard.com/install/) from the official website or your device's app store.
 
 ## Key Generation
 
@@ -70,7 +80,16 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
 ### On Client
 
-1. **Generate client keys:**
+#### Linux
+
+1. **Navigate to WireGuard directory:**
+
+    ```bash
+    mkdir -p ~/wireguard
+    cd ~/wireguard
+    ```
+
+2. **Generate client keys:**
 
     ```bash
     wg genkey | tee client_privatekey | wg pubkey > client_publickey
@@ -78,6 +97,15 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
     - `client_privatekey`: Client's private key.
     - `client_publickey`: Client's public key.
+
+#### Windows, iOS, Android
+
+1. **Use the WireGuard application to generate keys:**
+
+    - Open the WireGuard app.
+    - Click on "Add Tunnel" > "Add empty tunnel..."
+    - The app will generate a private and public key pair.
+    - Save the private key securely and copy the public key for server configuration.
 
 ## Server Configuration
 
@@ -118,13 +146,13 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
 ## Client Configuration
 
+### Linux
+
 1. **Create/Edit WireGuard configuration:**
 
     ```bash
     sudo nano /etc/wireguard/wg0.conf
     ```
-
-    *On Windows, use the WireGuard application to add a new tunnel and input the configuration.*
 
 2. **Add the following configuration:**
 
@@ -146,6 +174,64 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
     - Replace `<server_public_ip>` with your server's public IP address.
 
 3. **Save and exit** (`Ctrl + O`, `Enter`, `Ctrl + X`).
+
+### Windows
+
+1. **Open WireGuard application.**
+
+2. **Add a new tunnel:**
+
+    - Click on "Add Tunnel" > "Add empty tunnel..."
+
+3. **Paste the client configuration:**
+
+    ```ini
+    [Interface]
+    PrivateKey = <client_privatekey>
+    Address = 10.0.0.2/24
+    DNS = 8.8.8.8
+
+    [Peer]
+    PublicKey = <server_publickey>
+    Endpoint = <server_public_ip>:51820
+    AllowedIPs = 0.0.0.0/0, ::/0
+    PersistentKeepalive = 25
+    ```
+
+    - Replace `<client_privatekey>` with the client's private key.
+    - Replace `<server_publickey>` with the server's public key.
+    - Replace `<server_public_ip>` with your server's public IP address.
+
+4. **Save and activate the tunnel.**
+
+### iOS/Android
+
+1. **Open WireGuard application.**
+
+2. **Add a new tunnel:**
+
+    - Tap on "+" > "Create from scratch" or "Import from file/device."
+
+3. **Enter the client configuration:**
+
+    ```ini
+    [Interface]
+    PrivateKey = <client_privatekey>
+    Address = 10.0.0.2/24
+    DNS = 8.8.8.8
+
+    [Peer]
+    PublicKey = <server_publickey>
+    Endpoint = <server_public_ip>:51820
+    AllowedIPs = 0.0.0.0/0, ::/0
+    PersistentKeepalive = 25
+    ```
+
+    - Replace `<client_privatekey>` with the client's private key.
+    - Replace `<server_publickey>` with the server's public key.
+    - Replace `<server_public_ip>` with your server's public IP address.
+
+4. **Save and activate the tunnel.**
 
 ## Firewall and Routing
 
@@ -176,7 +262,7 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
 ## Starting WireGuard
 
-### On Server and Client
+### On Server and Linux Client
 
 1. **Start and enable WireGuard:**
 
@@ -184,6 +270,13 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
     sudo systemctl start wg-quick@wg0
     sudo systemctl enable wg-quick@wg0
     ```
+
+### On Windows, iOS, Android
+
+1. **Activate the tunnel:**
+
+    - Open the WireGuard application.
+    - Toggle the switch next to your configured tunnel to "On."
 
 ## Verification
 
@@ -216,7 +309,7 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
         ```
 
     - **Access Websites:**
-      
+
       Open a web browser and navigate to any website (e.g., [https://www.google.com](https://www.google.com)).
 
 ## Troubleshooting
