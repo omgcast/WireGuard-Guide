@@ -1,8 +1,8 @@
+<!-- README.md -->
+
 # WireGuard Setup Guide for Arch Linux
 
-## Overview
-
-This guide provides a streamlined, step-by-step process to set up a secure WireGuard VPN on Arch Linux. It also explains the common pitfalls to avoid, ensuring a smooth and functional VPN configuration.
+This guide provides a streamlined, step-by-step process to set up a secure WireGuard VPN on Arch Linux. It ensures proper configuration of public and private keys to avoid common issues related to authentication and traffic routing.
 
 ## Table of Contents
 
@@ -36,6 +36,14 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
     ```bash
     sudo pacman -S wireguard-tools
+    ```
+
+3. **Install Nano Editor (Optional but Recommended):**
+
+    Nano is a user-friendly text editor that simplifies editing configuration files.
+
+    ```bash
+    sudo pacman -S nano
     ```
 
 ## Key Generation
@@ -284,7 +292,7 @@ This guide provides a streamlined, step-by-step process to set up a secure WireG
 
 **Solution:**
 - Enable IP forwarding permanently.
-
+  
     ```bash
     echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
     sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
